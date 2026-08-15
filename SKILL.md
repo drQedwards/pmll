@@ -1,6 +1,6 @@
 ---
 title: PMLL
-description: Persistent spatial and hyperdimensional memory for AI agents on Stellar
+description: Persistent spatial and  memory for AI agents on Stellar
 ---
 
 # PMLL
