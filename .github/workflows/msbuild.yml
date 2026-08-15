@@ -1,0 +1,35 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Build PPM
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: gcc -Wall -Wextra -ldl -lcurl -o pypm pypm.c
+
+    - name: Test
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: ./pypm doctor
