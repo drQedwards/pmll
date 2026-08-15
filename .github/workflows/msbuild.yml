@@ -1,0 +1,43 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Build PPM
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: gcc -Wall -Wextra -Wno-unused-function -o pypm Ppm.c -ldl -lcurl
+
+    - name: Test
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: ./pypm doctor
+
+    - name: Build Q_promise_lib
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: make -C Q_promise_lib clean && make -C Q_promise_lib
+
+    - name: Test Q_promise_lib (C)
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: make -C Q_promise_lib test
