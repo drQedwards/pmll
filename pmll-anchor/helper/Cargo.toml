@@ -1,0 +1,15 @@
+[package]
+name = "pmll-anchor-helper"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Native helper for the PMLL Stellar commitment surface — SHA-256 → store → verify"
+
+[[bin]]
+name = "pmll-anchor-helper"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+sha2 = "0.10"
+hex = "0.4"
