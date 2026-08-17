@@ -1,26 +1,47 @@
 # pmll-anchor Deploy & Init (Testnet)
 
 ## Prerequisites
-- `stellar` CLI on PATH (v27+)
+
+- Rust **1.84+** (target `wasm32v1-none` is not available before 1.84)
+- `rustup target add wasm32v1-none` (re-run after every toolchain upgrade)
+- `stellar` CLI on PATH (recent stable; wraps cargo for the correct target + opt)
 - A funded testnet account (secret key or alias)
-- Contract built: `stellar contract build` (produces `target/wasm32v1-none/release/pmll_anchor.wasm`)
+
+**Do not** build with `wasm32-unknown-unknown` on Rust 1.82+.  
+`soroban-sdk` rejects that target; the Soroban runtime does not support the extra WASM features it enables.
 
 ## 1. Build
+
 ```bash
-cd contracts/pmll-anchor
+cd pmll-anchor
 stellar contract build
 ```
 
+Produces:
+
+```text
+target/wasm32v1-none/release/pmll_anchor.wasm
+```
+
+Raw equivalent (only if you know what you are doing):
+
+```bash
+cargo build --target wasm32v1-none --release
+```
+
 ## 2. Deploy
+
 ```bash
 stellar contract deploy \
   --wasm target/wasm32v1-none/release/pmll_anchor.wasm \
   --source <YOUR_SECRET_OR_ALIAS> \
   --network testnet
 ```
-→ Copy the returned **Contract ID** (starts with `C...`)
+
+Copy the returned **Contract ID** (`C...`).
 
 ## 3. Initialize (one-time)
+
 ```bash
 stellar contract invoke \
   --id <CONTRACT_ID> \
@@ -29,11 +50,11 @@ stellar contract invoke \
   -- \
   init --admin <ADMIN_ADDRESS>
 ```
-Use the same address that controls the key, or a dedicated admin.
 
 ## 4. Smoke-test store + get
+
 ```bash
-# Generate a 32-byte id and commitment (example)
+# Example 32-byte hex id + commitment
 ID=0101010101010101010101010101010101010101010101010101010101010101
 COMMIT=2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a
 
@@ -52,10 +73,20 @@ stellar contract invoke \
   get --id $ID
 ```
 
-## 5. Record for SKILL.md / stellar.toml
-After successful deploy + init + store, note:
+Or use the native helper:
+
+```bash
+cd helper
+cargo run -- hash "episode:your-payload-here"
+# then paste the printed store command with the real --id <CONTRACT_ID>
+```
+
+## 5. Record
+
+After successful deploy + init + store, record:
+
 - Contract ID: `C...`
-- Deploy tx hash: (from the deploy response or explorer)
+- Deploy tx hash
 - Network: testnet
 
-Then replace `REPLACE_WITH_PMll_ANCHOR_CONTRACT_ID` in `stellar.toml` with the real Contract ID.
+Update root `stellar.toml` (`[contracts] pmll_anchor = "..."`) and the commitment section of `SKILL.md` so the surface is no longer "planned".
