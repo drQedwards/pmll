@@ -1,6 +1,6 @@
 ---
-title: PMLL
-description: Persistent spatial memory for AI agents (Stellar commitment anchoring planned)
+name: pmll
+description: Persistent spatial memory for AI agents (off-chain today; Stellar commitment anchoring planned). Use when working with PMLL, pmll-memory-mcp, agent memory layers, Context+, PPM context stitching, or on-chain memory commitments via Soroban.
 ---
 
 # PMLL
@@ -23,3 +23,22 @@ PMLL provides durable, structured memory primitives useful for agentic workflows
 ```bash
 pip install pmll-memory-mcp
 # or via npm: npx pmll-memory-mcp
+# or: npm install -g pmll-memory-mcp
+```
+
+2. Register it with your MCP client (Claude Desktop example — `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "pmll-memory-mcp": {
+      "command": "npx",
+      "args": ["pmll-memory-mcp"]
+    }
+  }
+}
+```
+
+(If installed via pip you can use `"command": "pmll-memory-mcp"` instead.)
+
+3. Restart the client / start a fresh session. The agent now has access to the full set of memory tools (`init`, `peek`, `set`, `resolve`, `flush`, graph ops, solution engine, etc.). Call `init` once at the start of a task, then `peek` before expensive operations.
