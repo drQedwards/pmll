@@ -11,7 +11,7 @@ PROJECT_REPO = "https://github.com/drQedwards/PPM"
 
 [contracts]
 # Soroban contract placeholder — replace with the actual contract ID (G... account ID owning the contract or the contract id string)
-pmll_anchor = "REPLACE_WITH_PMll_ANCHOR_CONTRACT_ID"
+pmll_anchor = "CBGJW7XCRL2V7UGJXPC5FDYY5TLXDC4TNJVXGYUVICP32PJA6ECGHBNP"
 
 [notes]
 # Example: after deploying the WASM and creating the contract on testnet, set pmll_anchor to the returned contract ID.
