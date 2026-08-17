@@ -1,18 +1,18 @@
-# PPM stellar.toml — placeholder for Soroban contract deployment
-# This file provides basic network and placeholder contract info for the PPM project.
-# Replace values below with the real deployed contract ID and any production network settings.
+# PMLL stellar.toml — SEP-1 style network + contract metadata
+# Contract: pmll-anchor (Soroban, target wasm32v1-none, soroban-sdk 27.x)
+# Build: cd pmll-anchor && stellar contract build
+#        → target/wasm32v1-none/release/pmll_anchor.wasm
 
-# Network passphrase (testnet by default here)
 NETWORK_PASSPHRASE = "Test SDF Network ; September 2015"
 NETWORK = "TESTNET"
 
-# Link back to the repository
-PROJECT_REPO = "https://github.com/drQedwards/PPM"
+PROJECT_REPO = "https://github.com/drQedwards/pmll"
 
 [contracts]
-# Soroban contract placeholder — replace with the actual contract ID (G... account ID owning the contract or the contract id string)
+# Replace with the live Contract ID after deploy + init + verified store.
+# Current value is the recorded testnet ID if already deployed; verify on explorer before relying on it.
 pmll_anchor = "CBGJW7XCRL2V7UGJXPC5FDYY5TLXDC4TNJVXGYUVICP32PJA6ECGHBNP"
 
 [notes]
-# Example: after deploying the WASM and creating the contract on testnet, set pmll_anchor to the returned contract ID.
-# If you prefer, you can add separate keys for mainnet/testnet, or include the deployed WASM hash here.
+# Build target MUST be wasm32v1-none (Rust 1.84+). Never wasm32-unknown-unknown on 1.82+.
+# After deploy: set pmll_anchor, record tx hash in SKILL.md, then agents may treat the surface as live.
