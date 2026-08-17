@@ -1,0 +1,13 @@
+# Soroban contracts must use wasm32v1-none (Rust 1.84+).
+# Prefer: stellar contract build
+# Equivalent: cargo build --target wasm32v1-none --release
+#
+# Do NOT use wasm32-unknown-unknown on Rust 1.82+ — soroban-sdk will panic
+# (reference-types / multi-value are unsupported by the Soroban runtime).
+
+[build]
+# Uncomment to default local cargo builds to the contract target:
+# target = "wasm32v1-none"
+
+[alias]
+contract-build = "build --target wasm32v1-none --release"
