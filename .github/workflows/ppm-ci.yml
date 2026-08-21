@@ -65,7 +65,7 @@ jobs:
           pip install pmll-memory-mcp==0.1.0
           # install from local checkout
           pip install -e .
-          pip install pytest mcp
+          pip install pytest 'mcp>=1.0.0,<2'
 
       - name: Build Q_promise_lib
         shell: bash
@@ -177,7 +177,7 @@ jobs:
           pip install pmll-memory-mcp
           pip install pmll-memory-mcp==0.1.0
           pip install -e .
-          pip install pytest mcp
+          pip install pytest 'mcp>=1.0.0,<2'
 
       - name: Build Q_promise_lib
         shell: bash
