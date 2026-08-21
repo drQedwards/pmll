@@ -105,6 +105,7 @@ export function PlayTest() {
   const [games, setGames] = useState<GameInfo[]>(() => harness.current.listGames());
   const [gameId, setGameId] = useState("ls20");
   const [frame, setFrame] = useState<FrameResponse | null>(null);
+  const frameRef = useRef<FrameResponse | null>(null);
   const [card, setCard] = useState<Scorecard | null>(null);
   const [log, setLog] = useState<PlayLog[]>([]);
   const [busy, setBusy] = useState(false);
@@ -113,6 +114,7 @@ export function PlayTest() {
   const store = useAnchorStore();
   const winOpen = useAnchorStore((s) => s.winOpen);
   const dismissWin = useAnchorStore((s) => s.dismissWin);
+  frameRef.current = frame;
 
   const sync = useCallback((res: FrameResponse) => {
     setFrame(res);
@@ -287,13 +289,13 @@ export function PlayTest() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ro = new ResizeObserver(() => {
-      const session = harness.current.session;
-      if (session) paintFrame(canvas, session.grid);
+      const current = frameRef.current;
+      if (current?.frame[0]) paintFrame(canvas, current.frame[0]);
     });
     ro.observe(canvas);
     const onClick = (ev: PointerEvent) => {
-      const session = harness.current.session;
-      if (!session) return;
+      const current = frameRef.current;
+      if (!current || current.state !== "NOT_FINISHED") return;
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const originX = Number(canvas.dataset.originX ?? 0);
@@ -318,7 +320,7 @@ export function PlayTest() {
     const h = harness.current;
     window.__controlsTest = {
       getPos: () => h.pos(),
-      setKeys: (codes: string[]) => {
+      setKeys: async (codes: string[]) => {
         const map: Record<string, ActionName> = {
           KeyA: "ACTION3",
           ArrowLeft: "ACTION3",
@@ -329,16 +331,14 @@ export function PlayTest() {
         };
         for (const c of codes) {
           const a = map[c];
-          if (a) h.cmd(a);
+          if (a) await send(a);
         }
-        const canvas = canvasRef.current;
-        if (canvas && h.session) paintFrame(canvas, h.session.grid);
       },
     };
     return () => {
       delete window.__controlsTest;
     };
-  }, []);
+  }, [send]);
 
   const runRandom = async () => {
     setBusy(true);
@@ -360,8 +360,17 @@ export function PlayTest() {
         const xy = action === "ACTION6" ? { x: 12 + i, y: 12 } : undefined;
         res = await send(action, xy);
       }
-      harness.current.closeScorecard();
-      setCard({ ...harness.current.scorecard! });
+      if (live) {
+        try {
+          await liveRef.current.closeScorecard();
+        } catch {
+          /* already closed or no card */
+        }
+        setCard((c) => (c ? { ...c, closed_at: Date.now() } : c));
+      } else {
+        harness.current.closeScorecard();
+        setCard({ ...harness.current.scorecard! });
+      }
     } finally {
       setBusy(false);
     }
@@ -568,7 +577,7 @@ declare global {
   interface Window {
     __controlsTest?: {
       getPos: () => { x: number; y: number };
-      setKeys: (codes: string[]) => void;
+      setKeys: (codes: string[]) => void | Promise<void>;
     };
   }
 }
