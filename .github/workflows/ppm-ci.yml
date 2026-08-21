@@ -302,7 +302,7 @@ jobs:
           # preflight check: refuse redlines
           ppm doctor --fail-on-red
           # publish (adjust flags to your PPM CLI)
-          ppm publish \\
-            --registry "$PPM_REGISTRY_URL" \\
-            --token "$PPM_REGISTRY_TOKEN" \\
+          ppm publish \
+            --registry "$PPM_REGISTRY_URL" \
+            --token "$PPM_REGISTRY_TOKEN" \
             --wheelhouse ./wheelhouse
