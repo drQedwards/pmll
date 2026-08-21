@@ -32,6 +32,7 @@ Read these before writing any code that touches the commitment surface.
 - Integration with forloopcodes/contextplus for hierarchical indexing and supermodeltools/cli for graphing and analysis.
 - Atomic Soroban `pmll-anchor` contract (source at `pmll-anchor/`) that stores only a 32-byte commitment + emits events (full payload stays off-chain).
 - Native Rust helper (`pmll-anchor/helper`) that turns any payload into the exact store arguments.
+- **Lattice** (`lattice/`) — playable Stellar skills graph, browser hasher, sealed-win receipt, and ARC-AGI-3 Full Play Test that commits a WIN through PMLL.
 
 ## Quick start (memory MCP)
 
@@ -104,6 +105,37 @@ This prints the 32-byte commitment, a derived ID, and the exact `stellar contrac
 
 Until a verified testnet deployment + transaction hash is recorded in this file, treat the surface as planned. A candidate ID may appear in `stellar.toml` — always verify on-chain before depending on it.
 
+## Lattice (graph + ARC-AGI-3)
+
+Playable surface in `lattice/`. Graph of [skills.stellar.org](https://skills.stellar.org) with PMLL as a skill node. Anchor desk hashes an episode (SHA-256, 32 bytes), shows the exact `stellar contract invoke` line, and a **Sealed** overlay pulses the graph.
+
+### ARC-AGI-3 Full Play Test
+
+`lattice/src` implements the [full play test](https://docs.arcprize.org/full-play-test) against `https://three.arcprize.org`:
+
+1. `GET /api/games` (default `ls20`)
+2. Open scorecard → `RESET` → `ACTION1–7` → close
+3. 64×64 frames, discrete actions
+4. On `WIN`, compose `episode:… agent=lattice skill=ARC-AGI-3` and `store` the 32-byte digest
+
+`ARC_API_KEY` is server-only (`process.env`). Never `VITE_`-prefix it.
+
+### Browser invoke (store)
+
+```bash
+stellar contract invoke \
+  --id $PMLL_CONTRACT_ID \
+  --source-account $STELLAR_ACCOUNT \
+  --rpc-url https://soroban-testnet.stellar.org \
+  --network-passphrase "Test SDF Network ; September 2015" \
+  --network testnet \
+  --send yes \
+  -- \
+  store \
+  --id 0x<32-byte-id> \
+  --commitment 0x<32-byte-sha256>
+```
+
 ## Links
 
 - Official catalog: https://skills.stellar.org
@@ -111,6 +143,7 @@ Until a verified testnet deployment + transaction hash is recorded in this file,
 - Contract: `pmll-anchor/`
 - Deploy: `pmll-anchor/DEPLOY.md`
 - Helper: `pmll-anchor/helper/`
+- Lattice: `lattice/`
 - Network metadata: `stellar.toml`
 - PPM / MCP tools: https://github.com/drQedwards/PPM
 - Context+: https://github.com/forloopcodes/contextplus
