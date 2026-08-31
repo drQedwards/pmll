@@ -1,6 +1,6 @@
 ---
 name: pmll
-description: Persistent spatial memory for AI agents. Off-chain payloads; Stellar testnet commitment anchoring is live via pmll-anchor. Use when working with PMLL, pmll-memory-mcp, agent memory layers, Context+, PPM context stitching, or on-chain memory commitments via Soroban.
+description: Persistent spatial memory for AI agents. Off-chain payloads; Stellar mainnet commitment anchoring is live via pmll-anchor. Use when working with PMLL, pmll-memory-mcp, agent memory layers, Context+, PPM context stitching, or on-chain memory commitments via Soroban.
 ---
 
 # PMLL
@@ -11,7 +11,7 @@ That is the root catalog. This skill is a community entry inside it. Load the of
 
 Gives AI agents persistent spatial memory so they can retain long-term context, form symbiotic memory layers, and maintain durable state across sessions.
 
-PMLL provides durable, structured memory primitives useful for agentic workflows. It supports the PPM project, Context+ pipelines, and supermodeltools/cli for analysis and visualization. **On-chain commitment anchoring on Stellar testnet is live:** the contract stores only a 32-byte hash of off-chain memory. Mainnet is not deployed.
+PMLL provides durable, structured memory primitives useful for agentic workflows. It supports the PPM project, Context+ pipelines, and supermodeltools/cli for analysis and visualization. **On-chain commitment anchoring on Stellar mainnet is live:** the contract stores only a 32-byte hash of off-chain memory. Testnet remains deployed as well.
 
 ## Gotchas
 
@@ -21,7 +21,7 @@ Read these before writing any code that touches the commitment surface.
 2. **`store` and `bump` require the admin** that was set in `init`. There is no permissionless write path in the current surface.
 3. **Always verify after store.** Call `get` (or RPC `getLedgerEntries`) and confirm the commitment matches before treating the anchor as real.
 4. **TTL is approximately 30 days.** Plan a bump policy if the commitment must live longer.
-5. **Do not invent a contract ID.** Use the verified testnet ID recorded below (and in `stellar.toml`). Confirm it on an explorer before depending on it. Mainnet is not deployed.
+5. **Do not invent a contract ID.** Use the verified mainnet ID recorded below (and in `stellar.toml`). Confirm it on an explorer before depending on it.
 6. **The helper emits exact `stellar contract invoke` lines.** Use them. Do not hand-roll argument encoding.
 7. **Build target is `wasm32v1-none` only** (Rust 1.84+). Never `wasm32-unknown-unknown` on Rust 1.82+ — `soroban-sdk` panics and the Soroban runtime rejects the extra WASM features.
 
@@ -66,7 +66,23 @@ pip install pmll-memory-mcp
 **Source:** `pmll-anchor/`  
 **SDK:** `soroban-sdk = "27.0.6"`  
 **Target:** `wasm32v1-none` (required)  
-**Network:** testnet (live)
+**Network:** mainnet (live); testnet also deployed
+
+### Verified mainnet deploy (2026-08-31)
+
+| | |
+|---|---|
+| Contract ID | `CCF3B64AXLS4OLY5RN4H4K2CFZAYNZCJQY5MKCKCVAKMZNH7G7F7XUUF` |
+| Admin | `GBFOFCD3XDANQWSGMHKJJ2V3YXS2QQD7RNC4LMDBVNBTUJOQZ3RLSB3E` |
+| Wasm hash | `1b6ad9c574e0f5c9e39968f836a410c03adcf057afa93a63d2710bd30fdd53ba` |
+| Upload tx | [`b41353eaa5a2b93786761f5ab942ac96b38c1399ef021715c96923aa8c621e5e`](https://stellar.expert/explorer/public/tx/b41353eaa5a2b93786761f5ab942ac96b38c1399ef021715c96923aa8c621e5e) |
+| Deploy tx | [`d76e622d641b2465d480470f851f604a8284427a4e680c872b3ff8209c825943`](https://stellar.expert/explorer/public/tx/d76e622d641b2465d480470f851f604a8284427a4e680c872b3ff8209c825943) |
+| Init tx | [`ecf3a637077d998febeac9ed5edd1a12582b5fc38db855633f2b48d40a5ba7a5`](https://stellar.expert/explorer/public/tx/ecf3a637077d998febeac9ed5edd1a12582b5fc38db855633f2b48d40a5ba7a5) |
+| First store tx | [`a64481feb3aaf8d4ee1a383dfb3b1633b23df5a38d1b61d7c07f9e672f144bbf`](https://stellar.expert/explorer/public/tx/a64481feb3aaf8d4ee1a383dfb3b1633b23df5a38d1b61d7c07f9e672f144bbf) |
+
+Contract: [stellar.expert](https://stellar.expert/explorer/public/contract/CCF3B64AXLS4OLY5RN4H4K2CFZAYNZCJQY5MKCKCVAKMZNH7G7F7XUUF) · [lab](https://lab.stellar.org/r/mainnet/contract/CCF3B64AXLS4OLY5RN4H4K2CFZAYNZCJQY5MKCKCVAKMZNH7G7F7XUUF)
+
+First live `get` returned `1445bb037d8948ac03687ede656c27bc480a74db74a88224821379280d9e64d1` (SHA-256 of `episode:2026-08-31T19:42Z agent=pmll-admin skill=pmll-anchor event=first-mainnet-store`).
 
 ### Verified testnet deploy (2026-08-31)
 
@@ -117,7 +133,7 @@ This prints the 32-byte commitment, a derived ID, and the exact `stellar contrac
 
 1. Agent uses the memory MCP (`peek` / `set` / `flush`) to produce a durable episode.
 2. Hash the episode with the helper.
-3. Admin (or a controlled key) submits the `store` transaction on testnet.
+3. Admin (or a controlled key) submits the `store` transaction on mainnet.
 4. Any later agent can prove the commitment existed by calling `get`.
 
 ## Lattice (graph + ARC-AGI-3)
@@ -139,11 +155,11 @@ Playable surface in `lattice/`. Graph of [skills.stellar.org](https://skills.ste
 
 ```bash
 stellar contract invoke \
-  --id CDLQR24LLFWXTNGGJVJCRXAF3ZRDWFZRUFTDZ5SJOT2J33CS7DDYP7IU \
+  --id CCF3B64AXLS4OLY5RN4H4K2CFZAYNZCJQY5MKCKCVAKMZNH7G7F7XUUF \
   --source-account $STELLAR_ACCOUNT \
-  --rpc-url https://soroban-testnet.stellar.org \
-  --network-passphrase "Test SDF Network ; September 2015" \
-  --network testnet \
+  --rpc-url https://soroban-rpc.mainnet.stellar.gateway.fm \
+  --network-passphrase "Public Global Stellar Network ; September 2015" \
+  --network pubnet \
   --send yes \
   -- \
   store \

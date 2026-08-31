@@ -101,3 +101,14 @@ Update root `stellar.toml` (`[contracts] pmll_anchor = "..."`) and the commitmen
 | Deploy tx | `2ce19becde68f1e542fc46b39285fc377ea3f77a32ead87a8e1e06d4eff8274c` |
 | Init tx | `8489f4375ad32073fcb87044205f9fa2fa9511f982d73d1a703844331980593c` |
 | First store tx | `1a3faca93eb54cd64ee2133287939615d96750facb7875c1c93d08765f781b6d` |
+
+## Live mainnet (2026-08-31)
+
+| | |
+|---|---|
+| Contract ID | `CCF3B64AXLS4OLY5RN4H4K2CFZAYNZCJQY5MKCKCVAKMZNH7G7F7XUUF` |
+| Admin | `GBFOFCD3XDANQWSGMHKJJ2V3YXS2QQD7RNC4LMDBVNBTUJOQZ3RLSB3E` |
+| Wasm hash | `1b6ad9c574e0f5c9e39968f836a410c03adcf057afa93a63d2710bd30fdd53ba` |
+| Deploy tx | `d76e622d641b2465d480470f851f604a8284427a4e680c872b3ff8209c825943` |
+| Init tx | `ecf3a637077d998febeac9ed5edd1a12582b5fc38db855633f2b48d40a5ba7a5` |
+| First store tx | `a64481feb3aaf8d4ee1a383dfb3b1633b23df5a38d1b61d7c07f9e672f144bbf` |
