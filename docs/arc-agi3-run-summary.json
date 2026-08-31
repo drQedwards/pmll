@@ -1,0 +1,38 @@
+{
+  "agent": "the persistence in memory",
+  "card_id": "fa62e88d-607e-402d-91d4-ca61ad597cab",
+  "scorecard_url": "https://arcprize.org/scorecards/fa62e88d-607e-402d-91d4-ca61ad597cab",
+  "competition_mode": true,
+  "score": 0.1299442794266887,
+  "total_environments": 25,
+  "total_environments_completed": 0,
+  "total_levels": 183,
+  "total_levels_completed": 3,
+  "total_actions": 3887,
+  "source_url": "https://github.com/drQedwards/pmll",
+  "learned_from_scorecard": "https://arcprize.org/scorecards/8aaeff26-b817-4d32-b4cd-e4b9251370b1",
+  "learned_from_http": 404,
+  "progress": [
+    {
+      "id": "vc33-5430563c",
+      "title": "VC33",
+      "levels_completed": 2,
+      "level_count": 7,
+      "score": 2.3267022237624557,
+      "level_actions": [9, 118, 220]
+    },
+    {
+      "id": "r11l-495a7899",
+      "title": "R11L",
+      "levels_completed": 1,
+      "level_count": 6,
+      "score": 0.9219047619047619,
+      "level_actions": [50, 199]
+    }
+  ],
+  "tags_scores": [
+    {"id": "click", "levels_completed": 3, "score": 0.33938820186887053},
+    {"id": "keyboard_click", "levels_completed": 0, "score": 0.0},
+    {"id": "keyboard", "levels_completed": 0, "score": 0.0}
+  ]
+}

@@ -151,6 +151,8 @@ Playable surface in `lattice/`. Graph of [skills.stellar.org](https://skills.ste
 
 `ARC_API_KEY` is server-only (`process.env`). Never `VITE_`-prefix it.
 
+Competition-mode agent **the persistence in memory** (`lattice/scripts/persistence_in_memory.py`) plays the 25-game public set sequentially with a hashed frame/action silo. Closed scorecard: [fa62e88d-607e-402d-91d4-ca61ad597cab](https://arcprize.org/scorecards/fa62e88d-607e-402d-91d4-ca61ad597cab) (`competition_mode`, 25/25 environments, 3/183 levels).
+
 ### Browser invoke (store)
 
 ```bash
