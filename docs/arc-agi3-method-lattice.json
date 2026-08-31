@@ -1,0 +1,66 @@
+{
+  "agent": "pmll merge ascend",
+  "note": "PMLL merges the public method cards (ideas, not weights or paid coding-agent runs). Top board scores used GPT-5.6 / Claude Opus at $400–$2986. This lattice stores what those methods do so a $0 silo can run the same loop: log, hypothesize, falsify, plan, persist.",
+  "board": [
+    {
+      "name": "Tycho",
+      "score": 100.0,
+      "cost": 2986,
+      "code": "https://github.com/NIMI-research/Tycho",
+      "skill": "multimodal actor delegates a falsification-tested executable world model to a builder; plan through it or bypass"
+    },
+    {
+      "name": "Retrodict",
+      "score": 99.9,
+      "cost": 654,
+      "code": "https://github.com/ryanbbrown/Retrodict",
+      "skill": "log every frame; a rule must retrodict recorded history before it may spend a live action"
+    },
+    {
+      "name": "baseline1",
+      "score": 99.0,
+      "cost": 400,
+      "code": "https://github.com/astroseger/arc-3-agents-baseline1",
+      "skill": "build and verify an executable Python world model, then plan through it"
+    },
+    {
+      "name": "NOOA",
+      "score": 85.1,
+      "cost": 332,
+      "skill": "reusable NumPy world-model helpers; persist learning in memory or Markdown"
+    },
+    {
+      "name": "OPINE-World",
+      "score": 78.4,
+      "cost": 1040,
+      "skill": "CEGIS: one agent acts, the other rewrites and adversarially tests the engine"
+    },
+    {
+      "name": "TELL",
+      "score": 43.9,
+      "cost": 1406,
+      "skill": "compound confirmed knowledge in a durable MEMORY file"
+    },
+    {
+      "name": "Continual Harness",
+      "score": 20.5,
+      "cost": 774,
+      "skill": "refiner rewrites policy, memory, skills, and subagents from trajectory evidence"
+    },
+    {
+      "name": "the persistence in memory",
+      "score": 0.1756,
+      "cost": 0,
+      "code": "https://github.com/drQedwards/pmll",
+      "skill": "hashed-frame silo, JSONL recipes, per-life tried set"
+    }
+  ],
+  "merge": [
+    "world_model: (game, signature, action) -> predicted next signature, delta, level_up",
+    "retrodict: a transition is only trusted if it matched observed history at least once",
+    "falsify: predicted change that did not happen is demoted (CEGIS)",
+    "plan: greedy walk along trusted edges toward a level_up node",
+    "persist: JSONL + world_model.json in the PMLL silo"
+  ],
+  "live_card": "https://arcprize.org/scorecards/6d9ec3e7-a36d-47f2-91e7-a67effdef69a"
+}
