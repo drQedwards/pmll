@@ -9,6 +9,8 @@
 [![npm](https://img.shields.io/npm/v/pmll-memory-mcp?label=pmll-memory-mcp)](https://www.npmjs.com/package/pmll-memory-mcp)
 [![Sponsor](https://img.shields.io/badge/sponsor-DrQedwards-ea4aaa?logo=github-sponsors)](https://github.com/sponsors/DrQedwards)
 
+Live Stellar `pmll-anchor` IDs (mainnet + testnet): [docs/STELLAR.md](docs/STELLAR.md).
+
 > **TL;DR**: `pypm` aims to be a **single command** that handles everything from creating a
 > virtual-env to publishing wheels—fast, deterministic, and hackable.
 > The current release is ~500 LOC of portable C that already boots a shell, diagnoses
@@ -32,10 +34,11 @@ semantic memory graph for 99% accuracy.
 5. [Plugin System](#-plugin-system)
 6. [Configuration](#-configuration)
 7. [PMLL Memory MCP Server](#-pmll-memory-mcp-server)
-8. [Architecture](#-architecture)
-9. [Release Notes](#-release-notes)
-10. [Roadmap](#-roadmap)
-11. [Contributing & Sponsors](#-contributing--sponsors)
+8. [Stellar commitments](#-stellar-commitments-pmll-anchor)
+9. [Architecture](#-architecture)
+10. [Release Notes](#-release-notes)
+11. [Roadmap](#-roadmap)
+12. [Contributing & Sponsors](#-contributing--sponsors)
 
 ---
 
@@ -682,6 +685,21 @@ docker run --rm -i \
 | **Context+** | [github.com/ForLoopCodes/contextplus](https://github.com/ForLoopCodes/contextplus) | Integrated | Long-term semantic memory graph, adapted into `memory-graph.ts` and `solution-engine.ts`. By [@ForLoopCodes](https://github.com/ForLoopCodes). |
 
 Full MCP server documentation: [`mcp/README.md`](mcp/README.md)
+
+---
+
+## ⚓ Stellar commitments (`pmll-anchor`)
+
+Memory payloads stay **off-chain**. Optional 32-byte SHA-256 commitments are **live on Stellar mainnet** via [`drQedwards/pmll`](https://github.com/drQedwards/pmll) (`pmll-anchor`). Full payloads are never stored on-chain.
+
+| Network | Contract ID | Explorer |
+|---------|-------------|---------| 
+| **mainnet** | `CCF3B64AXLS4OLY5RN4H4K2CFZAYNZCJQY5MKCKCVAKMZNH7G7F7XUUF` | [stellar.expert](https://stellar.expert/explorer/public/contract/CCF3B64AXLS4OLY5RN4H4K2CFZAYNZCJQY5MKCKCVAKMZNH7G7F7XUUF) |
+| testnet | `CDLQR24LLFWXTNGGJVJCRXAF3ZRDWFZRUFTDZ5SJOT2J33CS7DDYP7IU` | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CDLQR24LLFWXTNGGJVJCRXAF3ZRDWFZRUFTDZ5SJOT2J33CS7DDYP7IU) |
+
+Admin: `GBFOFCD3XDANQWSGMHKJJ2V3YXS2QQD7RNC4LMDBVNBTUJOQZ3RLSB3E` · wasm hash `1b6ad9c574e0f5c9e39968f836a410c03adcf057afa93a63d2710bd30fdd53ba`
+
+Skill (API + invoke): [pmll/SKILL.md](https://github.com/drQedwards/pmll/blob/main/SKILL.md)
 
 ---
 
