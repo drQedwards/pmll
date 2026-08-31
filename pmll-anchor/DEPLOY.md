@@ -34,7 +34,7 @@ cargo build --target wasm32v1-none --release
 ```bash
 stellar contract deploy \
   --wasm target/wasm32v1-none/release/pmll_anchor.wasm \
-  --source <YOUR_SECRET_OR_ALIAS> \
+  --source-account <YOUR_SECRET_OR_ALIAS> \
   --network testnet
 ```
 
@@ -45,7 +45,7 @@ Copy the returned **Contract ID** (`C...`).
 ```bash
 stellar contract invoke \
   --id <CONTRACT_ID> \
-  --source <YOUR_SECRET_OR_ALIAS> \
+  --source-account <YOUR_SECRET_OR_ALIAS> \
   --network testnet \
   -- \
   init --admin <ADMIN_ADDRESS>
@@ -54,20 +54,20 @@ stellar contract invoke \
 ## 4. Smoke-test store + get
 
 ```bash
-# Example 32-byte hex id + commitment
+# Example 32-byte hex id + commitment (64 hex chars each — not 66)
 ID=0101010101010101010101010101010101010101010101010101010101010101
-COMMIT=2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a
+COMMIT=2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a
 
 stellar contract invoke \
   --id <CONTRACT_ID> \
-  --source <YOUR_SECRET_OR_ALIAS> \
+  --source-account <YOUR_SECRET_OR_ALIAS> \
   --network testnet \
   -- \
   store --id $ID --commitment $COMMIT
 
 stellar contract invoke \
   --id <CONTRACT_ID> \
-  --source <YOUR_SECRET_OR_ALIAS> \
+  --source-account <YOUR_SECRET_OR_ALIAS> \
   --network testnet \
   -- \
   get --id $ID
@@ -89,4 +89,15 @@ After successful deploy + init + store, record:
 - Deploy tx hash
 - Network: testnet
 
-Update root `stellar.toml` (`[contracts] pmll_anchor = "..."`) and the commitment section of `SKILL.md` so the surface is no longer "planned".
+Update root `stellar.toml` (`[contracts] pmll_anchor = "..."`) and the commitment section of `SKILL.md`.
+
+## Live testnet (2026-08-31)
+
+| | |
+|---|---|
+| Contract ID | `CDLQR24LLFWXTNGGJVJCRXAF3ZRDWFZRUFTDZ5SJOT2J33CS7DDYP7IU` |
+| Admin | `GBFOFCD3XDANQWSGMHKJJ2V3YXS2QQD7RNC4LMDBVNBTUJOQZ3RLSB3E` |
+| Wasm hash | `1b6ad9c574e0f5c9e39968f836a410c03adcf057afa93a63d2710bd30fdd53ba` |
+| Deploy tx | `2ce19becde68f1e542fc46b39285fc377ea3f77a32ead87a8e1e06d4eff8274c` |
+| Init tx | `8489f4375ad32073fcb87044205f9fa2fa9511f982d73d1a703844331980593c` |
+| First store tx | `1a3faca93eb54cd64ee2133287939615d96750facb7875c1c93d08765f781b6d` |
