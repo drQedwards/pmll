@@ -13,6 +13,8 @@ Gives AI agents persistent spatial memory so they can retain long-term context, 
 
 PMLL provides durable, structured memory primitives useful for agentic workflows. It supports the PPM project, Context+ pipelines, and supermodeltools/cli for analysis and visualization. **On-chain commitment anchoring on Stellar mainnet is live:** the contract stores only a 32-byte hash of off-chain memory. Testnet remains deployed as well.
 
+Typed off-chain **codework / episode** payload: root [`skill.ts`](./skill.ts) (mirrored on [drQedwards/ppm](https://github.com/drQedwards/ppm)). Serialize with `serializeCodework` / `hashCodework` → SHA-256 → `store(id, commitment)`. No new Soroban ABI fields.
+
 ## Gotchas
 
 Read these before writing any code that touches the commitment surface.
@@ -24,15 +26,42 @@ Read these before writing any code that touches the commitment surface.
 5. **Do not invent a contract ID.** Use the verified mainnet ID recorded below (and in `stellar.toml`). Confirm it on an explorer before depending on it.
 6. **The helper emits exact `stellar contract invoke` lines.** Use them. Do not hand-roll argument encoding.
 7. **Build target is `wasm32v1-none` only** (Rust 1.84+). Never `wasm32-unknown-unknown` on Rust 1.82+ — `soroban-sdk` panics and the Soroban runtime rejects the extra WASM features.
+8. **Do not invent Soroban ABI fields.** Ground payload shape in `skill.ts` + `pmll-anchor` (`init` / `store` / `get` / `bump` only).
 
 ## Highlights
 
 - Persistent, addressable spatial memory (off-chain today).
+- **Semantic memory silo** (`memory_silo_t`): integer tree + `slots` / `embed_dim` (`PMLL_EMBED_DIM=32`) / `slot_count`.
+- **peek / peek_semantic dual-path** — exact key or index, else cosine over embeddings (`silo_embed_text`, `silo_cosine_similarity`).
+- **silo_set / free_silo** — write key/content + embedding; free owned silo memory.
+- **init_pml** sets `assignment[i] = -1` (undecided); `check_conflict` treats `-1` as undecided (not false).
+- **SAT bridge** — `sat_bridge_literal` / `sat_bridge_clause` / `sat_bridge_assignment_meanings` map 3SAT tokens up to associative memory string literals in the silo.
+- **MCP compat:** `MCPServer` (mcp 2.x) with `FastMCP` fallback (mcp 1.x).
 - PPM-based context stitching and MCP tools for memory ingestion and retrieval.
 - Integration with forloopcodes/contextplus for hierarchical indexing and supermodeltools/cli for graphing and analysis.
 - Atomic Soroban `pmll-anchor` contract (source at `pmll-anchor/`) that stores only a 32-byte commitment + emits events (full payload stays off-chain).
 - Native Rust helper (`pmll-anchor/helper`) that turns any payload into the exact store arguments.
 - **Lattice** (`lattice/`) — playable Stellar skills graph, browser hasher, sealed-win receipt, and ARC-AGI-3 Full Play Test that commits a WIN through PMLL.
+
+
+## C core (post-merge)
+
+Headers: `PMLL.h` · implementation: `PMLL.c` (merged via pmll#4 / semantic-silo).
+
+| Symbol | Role |
+|---|---|
+| `memory_silo_t` | `tree`, `size`, `slots[]`, `embed_dim`, `slot_count` |
+| `silo_slot_t` | `key`, `content`, `embedding`, `resolved` |
+| `init_silo` / `free_silo` | allocate / free silo |
+| `silo_set` | write key/content + embedding at index (or next free) |
+| `peek` | dual-path: exact key, else index |
+| `peek_semantic` | cosine ≥ `min_sim` over embeddings |
+| `silo_embed_text` / `silo_cosine_similarity` | hashing-trick embed + L2 cosine |
+| `init_pml` | **every `assignment[i] = -1`** (undecided) |
+| `check_conflict` | `-1` = undecided (not sticky false from calloc) |
+| `sat_bridge_*` | boolean / 3SAT → associative strings via `silo_set` |
+
+Typed mirror for agents / Stellar pickup: [`skill.ts`](./skill.ts) (`MemorySilo`, `PeekResult`, `CodeworkPayload`, `hashCodework`, `PMLL_ANCHOR`).
 
 ## Quick start (memory MCP)
 
@@ -61,12 +90,15 @@ pip install pmll-memory-mcp
 
 3. Restart the client / start a fresh session. The agent now has access to the full set of memory tools (`init`, `peek`, `set`, `resolve`, `flush`, graph ops, solution engine, etc.). Call `init` once at the start of a task, then `peek` before expensive operations.
 
+MCP server construction prefers `mcp.server.mcpserver.MCPServer` (mcp ^2) and falls back to `mcp.server.fastmcp.FastMCP` on mcp 1.x — see `mcp/pmll_memory_mcp/server.py`.
+
 ## Stellar commitment surface
 
 **Source:** `pmll-anchor/`  
 **SDK:** `soroban-sdk = "27.0.6"`  
 **Target:** `wasm32v1-none` (required)  
 **Network:** mainnet (live); testnet also deployed
+**Typed payload:** [`skill.ts`](./skill.ts)
 
 ### Verified mainnet deploy (2026-08-31)
 
@@ -119,6 +151,27 @@ See `pmll-anchor/DEPLOY.md` for deploy / init / smoke-test.
 - `bump(id)` — extend TTL (admin only)
 
 Events: `(pmll, anchor)` with `(id, commitment)`.
+
+
+### Codework pickup (skill.ts → Soroban)
+
+1. Build a `CodeworkPayload` (or plain episode string) describing the off-chain memory work.
+2. `serializeCodework` → UTF-8 text; `hashCodework` → `{ id, commitment }` (SHA-256).
+3. Admin submits `store --id 0x… --commitment 0x…` against the verified contract ID.
+4. Later agents prove existence with `get`. Structured silo / SAT / peek fields in `CodeworkPayload.memory` never leave off-chain storage.
+
+```ts
+import {
+  exampleSemanticSiloCodework,
+  hashCodework,
+  toStoreArgs,
+  PMLL_ANCHOR,
+} from "./skill.ts";
+
+const hash = await hashCodework(exampleSemanticSiloCodework({ skill: "pmll" }));
+const { id, commitment } = toStoreArgs(hash);
+// stellar contract invoke --id PMLL_ANCHOR.mainnet.contractId -- store ...
+```
 
 ### Native helper
 
