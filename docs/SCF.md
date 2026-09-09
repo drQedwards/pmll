@@ -1,7 +1,10 @@
 # SCF Open Track
 
-Public product for SCF #45: **`interchain_auditor`** with live primitive **`pmll_anchor`**.
+Official SCF #45 product: **`alchemy-anchor`**.
 
+**https://github.com/drQedwards/alchemy-anchor**
+
+Live primitive **`pmll_anchor`** lives in this repo. Digest books:
 **https://github.com/drQedwards/interchain-auditor**
 
 Origin brief (interest-form title *Secure Memory Persistence in Agentic Wallets*):
