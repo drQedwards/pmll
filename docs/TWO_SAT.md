@@ -1,6 +1,6 @@
-# Linear 2-SAT, beside the CDCL solver
+# Linear 2-SAT, beside the general SAT solver
 
-`SAT.h` / `SAT.py` are a general CDCL-style solver: decisions, unit propagation, clause learning. That machinery decides CNFs of any width. It is not a polynomial-time bound.
+`SAT.c` / `SAT.h` are a general-width solver, but `sat_solve` runs plain DPLL: decisions, unit propagation, chronological backtracking. Clause learning is declared in `SAT.h` (`dpll_with_learning`, `analyze_conflict`) and selectable in the config, but it is not implemented in `SAT.c`. `SAT.py` is experimental: it currently raises `AttributeError` on its first solve (the propagation queue is a method, not a deque), and its conflict analysis is a stub whose learned clause is not, in general, implied by the formula. The Cython `SAT.pyx` uses the same simplified conflict analysis and is not exercised by the tests. None of these is a polynomial-time bound; DPLL is exponential in the worst case.
 
 `two_sat.py` is a different procedure, and only for clauses of width two. Each clause `(a ∨ b)` becomes the implications `(¬a → b)` and `(¬b → a)`. Strongly connected components of that graph decide the formula in time linear in variables plus clauses (Aspvall, Plass, Tarjan, 1979). A variable set true when its component index outranks the component of its negation is a satisfying assignment, unless some variable shares a component with its negation.
 
