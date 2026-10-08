@@ -4,7 +4,9 @@
 PMLL recursive silo: hash frames, remember which actions changed the board,
 replay level-up recipes from prior JSONL loops, and prefer novel or
 previously-progressing moves. Sequential (one session) with 429 backoff.
-ARC_API_KEY from env only.
+ARC_API_KEY from env only. Needs `requests` (lattice/scripts/requirements.txt).
+Output goes to $ARC_PERSISTENCE_OUT (default /tmp/arc-persistence); the
+directory must belong to the current user and not be group/world-writable.
 """
 from __future__ import annotations
 
@@ -12,6 +14,7 @@ import hashlib
 import json
 import os
 import random
+import stat
 import time
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -26,7 +29,7 @@ SOURCE_URL = "https://github.com/drQedwards/pmll"
 DEADLINE_SEC = 13 * 60 + 20
 MIN_INTERVAL = 0.11
 VERSION = "1.5"
-OUT = Path("/tmp/arc-persistence")
+OUT = Path(os.environ.get("ARC_PERSISTENCE_OUT") or "/tmp/arc-persistence")
 JSONL = OUT / "v1.5.jsonl"
 RECIPE_TRIES = 6
 PRIOR_CARD = "fa62e88d-607e-402d-91d4-ca61ad597cab"
@@ -204,6 +207,9 @@ class Client:
             "Content-Type": "application/json",
         })
         self.last = 0.0
+        # Absolute time after which 429 retries stop (set while games are played),
+        # so a sustained rate limit cannot delay the scorecard close.
+        self.deadline: Optional[float] = None
 
     def _pace(self) -> None:
         wait = MIN_INTERVAL - (time.time() - self.last)
@@ -220,6 +226,8 @@ class Client:
             else:
                 r = self.s.post(ROOT + path, json=body or {}, timeout=timeout)
             if r.status_code == 429:
+                if self.deadline is not None and time.time() + backoff >= self.deadline:
+                    break
                 time.sleep(backoff)
                 backoff = min(backoff * 2, 40)
                 continue
@@ -493,6 +501,11 @@ def play_game(client: Client, game: dict, card_id: str, deadline: float, silo: S
             summary["actions"] += 1
             steps += 1
             new_levels = int(nxt.get("levels_completed") or 0)
+            # Record this response now: if it was the last allowed action, the
+            # loop exits before the next iteration would read it.
+            summary["best_levels"] = max(summary["best_levels"], new_levels)
+            if nxt.get("state"):
+                summary["best_state"] = nxt.get("state")
             jsonl_write({
                 "t": round(time.time(), 3), "game": title, "game_id": gid,
                 "action": name, "xy": extra or None,
@@ -548,8 +561,26 @@ def learn_from_reference(client: Client) -> dict:
     return hint
 
 
+def prepare_out_dir(out: Path) -> None:
+    """Create the output directory (mode 0700) or accept an existing one only
+    if it is a real directory owned by this user and not group/world-writable.
+    A predictable path under /tmp could otherwise be pre-created by another
+    local user, who could then plant symlinks for our writes to follow."""
+    try:
+        out.mkdir(mode=0o700, parents=True)
+    except FileExistsError:
+        pass
+    st = os.lstat(out)
+    if not stat.S_ISDIR(st.st_mode):
+        raise SystemExit("{0} is not a directory (symlink?); refusing to write there".format(out))
+    if hasattr(os, "getuid") and st.st_uid != os.getuid():
+        raise SystemExit("{0} is owned by another user; set ARC_PERSISTENCE_OUT".format(out))
+    if st.st_mode & 0o022:
+        raise SystemExit("{0} is group/world-writable; chmod 700 it or set ARC_PERSISTENCE_OUT".format(out))
+
+
 def main() -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
+    prepare_out_dir(OUT)
     key = os.environ.get("ARC_API_KEY")
     if not key:
         raise SystemExit("ARC_API_KEY is not set")
@@ -601,6 +632,7 @@ def main() -> None:
     jsonl_write({"event": "open", "card_id": card_id, "agent": AGENT, "version": VERSION})
 
     deadline = time.time() + DEADLINE_SEC
+    client.deadline = deadline
     silo = Silo()
     ingested = ingest_jsonl(silo)
     print("WARM_SILO recipes={0} hits={1} ingested_levelups={2}".format(
@@ -634,6 +666,7 @@ def main() -> None:
             results.append(extra)
             (OUT / "results.json").write_text(json.dumps(results, indent=2))
 
+    client.deadline = None  # the close must still go through
     status, summary = client.req("POST", "/api/scorecard/close", {"card_id": card_id}, timeout=60)
     if status != 200:
         time.sleep(5)
