@@ -60,15 +60,19 @@ Ablations that *lowered* the score: v1.2 systematic no-shuffle clicks (0.0); v1.
 ## How to run
 
 ```bash
+pip install -r lattice/scripts/requirements.txt   # requests
 export ARC_API_KEY="…"   # from https://three.arcprize.org — never commit
 python3 lattice/scripts/persistence_in_memory.py
 ```
 
-1. `GET /api/games`
-2. Ingest prior JSONL level-ups into the silo
+Output goes to `$ARC_PERSISTENCE_OUT` (default `/tmp/arc-persistence`). The runner refuses a directory that is a symlink, owned by another user, or group/world-writable.
+
+1. Look up the learned-from reference card and the prior own card; write `learned_from.json`
+2. `GET /api/games`
 3. `POST /api/scorecard/open` with `competition_mode: true`, tags `the persistence in memory`
-4. Play every public game on one session (cookies / `AWSALB*`), sequential, 429 backoff. Click games first; keyboard games get a skim.
-5. `POST /api/scorecard/close` before the 15-minute auto-close
+4. Ingest prior JSONL level-ups into the silo
+5. Play public games on one session (cookies / `AWSALB*`), sequentially, until the 13 min 20 s play deadline; games not reached by then are skipped. Click games first; keyboard games get a skim. 429 backoff stops at the deadline.
+6. `POST /api/scorecard/close` before the 15-minute auto-close
 
 ## Method
 
