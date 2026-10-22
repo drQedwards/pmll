@@ -75,3 +75,27 @@ mempool has no root package.json, so backend/ and frontend/ were run separately.
 - Mainnet FORK (FORK-LOCAL anvil, same contract `0x024361c0eC3c1A9ED415E6ef3c859b48935DBe78`): tx `0x5e7c17273d742ca16cc2ae1a09c9cc5c26442bcd3910dd2aa4862df68bbc3e04`, block 26247291, status 1. The event is OK and the read-back is OK.
 - Stellar TESTNET (`CBMEMR3R…LNVG`): https://stellar.expert/explorer/testnet/tx/4d44764eaaccd235805a666574afe214b8ca2787b3af557c62fb3876e3cd7761. The event is (id, root), and get(id) returns the root.
 - Sepolia: see above.
+
+# Loop-back root (Merkle over previously anchored roots)
+
+Leaves are the three already-anchored Merkle roots (digests only; no payloads):
+
+| leaf label | prior root (sha256 hex) | prior Sepolia tx |
+|---|---|---|
+| `root:items1-3` | `e3632fd6ad6cfe927cf0977dc7b4195a60dbf47dd94dc9b703f33783230a51d9` | `0x8c93a72dcd8aa395cf14a5507345873e31378b6c6241ede2c769056655d520f3` |
+| `root:crypto-repos` | `8da01bfb39f4c5eae2bdc5ef28339ecca7702285e5d543a9a8a06493fdeb3faf` | `0xd03525ae1d75e22ae10553bdfff3dd3ecdb4518dafd0030d63cc2b744150c78c` |
+| `root:btc-puzzle-coverage` | `b32c9ae371a4fd3dacfdbc899c01f8e72b65a4477fb3210385ea4caf3641cfb6` | `0x47ada47d25c37dc23a1245c7372263f2bb7de3f342625c2b4c3124cf424d0120` |
+
+- **id** = sha256("pmll:depgraph:loopback:items1-3+crypto+btc-coverage") = `0xe7eb6d2df1893ae78522ea1aaf71408aca0c3ae961b62fdb16497923968970f7`
+- **root** (3 leaves, same Merkle construction as anchor.php) = `0x5a989b70099212538ff415ab376e56fd41fc912f8721b001bf7ba95214fc35b5`
+- Manifest: `anchor_manifest_loopback.json`
+
+## Sepolia
+- PmllAnchor `0x37Da96f2a88Ae7E67A7FB305891a8c433B8B5C8D`
+- store tx: [`0xda21bc2c62d31136eda76b71d358ba1dceace3071e6205b0f65990914807fefb`](https://sepolia.etherscan.io/tx/0xda21bc2c62d31136eda76b71d358ba1dceace3071e6205b0f65990914807fefb), block 11968892, status 1
+- Anchor event **OK**, get(id) read-back **OK** (re-checked after confirm)
+
+## Stellar TESTNET
+- Contract `CBMEMR3R5DYQIDDV26HSDTY4H3XIUDRZFJ76MNVFLOTRRTUMYBN7LNVG`
+- store: https://stellar.expert/explorer/testnet/tx/5bdb9b588c3f93ead6c9511ff87c561a1321eadeee953e7d1ad8de3566fdf1a8
+- Event `("pmll","anchor") = (id, root)` emitted; `get(id)` returns the root
