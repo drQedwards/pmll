@@ -1,0 +1,54 @@
+name: water-metric
+
+on:
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: "Number of tasks to run (each = 4 turns x 3 arms)"
+        required: false
+        default: "6"
+
+permissions:
+  contents: read
+
+jobs:
+  water-metric:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: bench/water
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install requirements
+        run: pip install -r requirements.txt
+      - name: Mock test (no network)
+        run: python tests/mock_test.py && rm -f raw_turns_xai.csv
+      - name: Run xAI harness
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          TASKS: ${{ inputs.tasks }}
+        run: python harness_xai.py "$TASKS"
+      - name: Summarize
+        run: python summarize_xai.py
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## PMLL water metric (tasks=${{ inputs.tasks }})"
+            for f in summary_xai.csv water_xai.csv; do
+              if [ -f "$f" ]; then echo "### $f"; echo '```'; cat "$f"; echo '```'; fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: water-metric-results
+          path: |
+            bench/water/raw_turns_xai.csv
+            bench/water/summary_xai.csv
+            bench/water/water_xai.csv
+          if-no-files-found: warn
