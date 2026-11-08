@@ -1,0 +1,9 @@
+{
+    "id": "0xe7eb6d2df1893ae78522ea1aaf71408aca0c3ae961b62fdb16497923968970f7",
+    "root": "0x5a989b70099212538ff415ab376e56fd41fc912f8721b001bf7ba95214fc35b5",
+    "leaves": {
+        "root:btc-puzzle-coverage": "b32c9ae371a4fd3dacfdbc899c01f8e72b65a4477fb3210385ea4caf3641cfb6",
+        "root:crypto-repos": "8da01bfb39f4c5eae2bdc5ef28339ecca7702285e5d543a9a8a06493fdeb3faf",
+        "root:items1-3": "e3632fd6ad6cfe927cf0977dc7b4195a60dbf47dd94dc9b703f33783230a51d9"
+    }
+}
