@@ -1,0 +1,19 @@
+{
+    "id": "0xe7eb6d2df1893ae78522ea1aaf71408aca0c3ae961b62fdb16497923968970f7",
+    "root": "0x5a989b70099212538ff415ab376e56fd41fc912f8721b001bf7ba95214fc35b5",
+    "leaves": {
+        "root:btc-puzzle-coverage": "b32c9ae371a4fd3dacfdbc899c01f8e72b65a4477fb3210385ea4caf3641cfb6",
+        "root:crypto-repos": "8da01bfb39f4c5eae2bdc5ef28339ecca7702285e5d543a9a8a06493fdeb3faf",
+        "root:items1-3": "e3632fd6ad6cfe927cf0977dc7b4195a60dbf47dd94dc9b703f33783230a51d9"
+    },
+    "source_txs": {
+        "items1-3": "0x8c93a72dcd8aa395cf14a5507345873e31378b6c6241ede2c769056655d520f3",
+        "crypto-repos": "0xd03525ae1d75e22ae10553bdfff3dd3ecdb4518dafd0030d63cc2b744150c78c",
+        "btc-puzzle-coverage": "0x47ada47d25c37dc23a1245c7372263f2bb7de3f342625c2b4c3124cf424d0120"
+    },
+    "prior_ids": {
+        "items1-3": "0xf6efc39c63a020558ee6b2b68786935b1ede3d7002cd68dfbecc16072a3796de",
+        "crypto-repos": "0x7e25ec0f47a9f4c2144a00b96fe10be36f9ad8368625da8555db351cddd2d7a6",
+        "btc-puzzle-coverage": "0xf1d54b4a22374d07ef533c8d15797b67cf92d973e6b43d439922445820e8a946"
+    }
+}
