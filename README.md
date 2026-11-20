@@ -1,6 +1,6 @@
 # PMLL: short-term memory and logic-loop model
 
-PMLL means **Persistent Memory Logic Loop**. Technically, it is a software pattern and implementation for storing, retrieving, and updating task context around a caller's work. It is not an LLM, a trained neural network, or a hardware circuit. “Circuit” is a useful metaphor for the repeatable retrieve → act → record cycle; the implemented components are ordinary data structures, lookup/scoring routines, and optional control-flow or logic modules.
+PMLL means **Persistent Memory Logic Loop**. Technically, it is a software pattern and implementation for storing, retrieving, and updating task context around a caller's work heuristically. It is not an LLM, a trained neural network, or a hardware circuit. “Circuit” is a useful metaphor for the repeatable retrieve → act → record cycle; the implemented components are ordinary data structures, lookup/scoring routines, and optional control-flow or logic modules.
 
 ## What the short-term memory is
 
