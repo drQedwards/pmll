@@ -68,8 +68,7 @@ static void propagate_backward(memory_silo_t *silo, int var, int value, int dept
 void silo_embed_text(const char *text, float *out, int dim)
 {
     const char *p;
-    char tok[64];
-    int ti, i;
+    int i;
     float norm;
 
     if (!out || dim <= 0) return;
@@ -80,19 +79,27 @@ void silo_embed_text(const char *text, float *out, int dim)
     while (*p) {
         while (*p && !isalnum((unsigned char)*p) && *p != '_' && *p != '-')
             p++;
-        ti = 0;
-        while (*p && (isalnum((unsigned char)*p) || *p == '_' || *p == '-') && ti < 63) {
-            tok[ti++] = (char)tolower((unsigned char)*p++);
+        if (!*p)
+            break;
+        /* Stream djb2 over the whole token. The previous 64-byte stack
+           buffer stopped at 63 characters and hashed the remainder as a
+           second token, so identifiers longer than 63 chars were split. */
+        unsigned long h = 5381UL;
+        int ti = 0;
+        while (*p && (isalnum((unsigned char)*p) || *p == '_' || *p == '-')) {
+            unsigned char c = (unsigned char)tolower((unsigned char)*p++);
+            h = ((h << 5) + h) + c;
+            ti++;
         }
-        tok[ti] = '\0';
         if (ti > 1) {
-            /* djb2-ish hash → bucket; signed contribution for diversity */
-            unsigned long h = 5381;
-            for (i = 0; i < ti; i++)
-                h = ((h << 5) + h) + (unsigned char)tok[i];
+            /* Signed CountSketch. The comment previously said "signed
+               contribution for diversity", but the body added only +1.0f
+               and +0.5f, trapping embeddings in the positive orthant. */
+            float s1 = (h & 1UL) ? 1.0f : -1.0f;
+            float s2 = ((h >> 1) & 1UL) ? 1.0f : -1.0f;
             i = (int)(h % (unsigned)dim);
-            out[i] += 1.0f;
-            out[(int)((h >> 8) % (unsigned)dim)] += 0.5f;
+            out[i] += s1;
+            out[(int)((h >> 8) % (unsigned)dim)] += 0.5f * s2;
         }
     }
 
